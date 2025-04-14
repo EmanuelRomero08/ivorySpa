@@ -35,7 +35,7 @@ public class manicurista
     {
         return telefono;
     }
-    public void setTelefono()
+    public void setTelefono(String telefono)
     {
         this.telefono = telefono;
     }

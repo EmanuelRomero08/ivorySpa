@@ -56,6 +56,6 @@ public class CitaFormulario
                 System.out.println("Opción inválida");
                 return null;
         }
-        return new cita(0, clienteId, dispSeleccionada.getManicuristaId(), dispSeleccionada.getId(), servicio, dispSeleccionada.getFecha(), dispSeleccionada.getHoraInicio(), "pendiente");
+        return new cita(0, clienteId, dispSeleccionada.getManicuristaId(), dispSeleccionada.getId(), servicio, dispSeleccionada.getFecha(), dispSeleccionada.getHoraInicio(), dispSeleccionada.getHoraFin(), "pendiente");
     }
 }

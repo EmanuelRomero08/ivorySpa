@@ -11,10 +11,11 @@ public class cita
     private int disponibilidadId;
     private String tipoServicio; 
     private Date fecha;
-    private Time hora;
+    private Time hora_inicio;
+    private Time hora_fin;
     private String estado;
     
-    public cita(int id, int clienteId, int manicuristaId, int disponibilidadId, String tipoServicio, Date fecha, Time hora, String estado) 
+    public cita(int id, int clienteId, int manicuristaId, int disponibilidadId, String tipoServicio, Date fecha, Time hora_inicio, Time hora_fin, String estado) 
     {
         this.id = id;
         this.clienteId = clienteId;
@@ -22,10 +23,11 @@ public class cita
         this.disponibilidadId = disponibilidadId;
         this.tipoServicio = tipoServicio;
         this.fecha = fecha;
-        this.hora = hora;
+        this.hora_inicio = hora_inicio;
+        this.hora_fin = hora_fin;
         this.estado = estado;
     }
-
+    
     public int getId() 
     { 
         return id; 
@@ -80,13 +82,22 @@ public class cita
         this.fecha = fecha; 
     }
     
-    public Time getHora() 
+    public Time getHoraInicio() 
     { 
-        return hora; 
+        return hora_inicio;
     }
-    public void setHora(Time hora) 
+    public void setHoraInicio(Time hora_inicio) 
     { 
-        this.hora = hora; 
+        this.hora_inicio = hora_inicio; 
+    }
+    
+    public Time getHoraFin() 
+    { 
+        return hora_fin;
+    }
+    public void setHoraFin(Time hora_fin) 
+    { 
+        this.hora_fin = hora_fin; 
     }
     
     public String getEstado() 

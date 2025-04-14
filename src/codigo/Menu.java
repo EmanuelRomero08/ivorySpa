@@ -8,175 +8,258 @@ public class Menu
     public static void mostrarMenuPrincipal() 
     {
         Scanner sc = new Scanner(System.in);
-        int opcion;
-        
+        int opcion = 0;
+
         do 
         {
-            System.out.println("\n=== MENÚ PRINCIPAL ===");
-            System.out.println("1. Soy cliente");
-            System.out.println("2. Soy manicurista");
-            System.out.println("3. Salir");
-            System.out.print("Seleccione una opción: ");
-            opcion = sc.nextInt();
-            sc.nextLine();
-            
-            switch(opcion) 
+            try 
             {
-                case 1:
-                    menuCliente();
-                    break;
-                case 2:
-                    menuManicurista();
-                    break;
-                case 3:
-                    System.out.println("Saliendo del sistema...");
-                    break;
-                default:
-                    System.out.println("Opción inválida");
+                System.out.println("\n=== MENÚ PRINCIPAL ===");
+                System.out.println("1. Soy cliente");
+                System.out.println("2. Soy manicurista");
+                System.out.println("3. Salir");
+                System.out.print("Seleccione una opción: ");
+                opcion = Integer.parseInt(sc.nextLine());
+
+                switch (opcion) 
+                {
+                    case 1:
+                        menuCliente();
+                        break;
+                    case 2:
+                        menuManicurista();
+                        break;
+                    case 3:
+                        System.out.println("Saliendo del sistema...");
+                        break;
+                    default:
+                        System.out.println("❌ Opción inválida. Intente de nuevo.");
+                }
+            } 
+            catch (NumberFormatException e) 
+            {
+                System.out.println("❌ Error: Ingrese un número válido (1, 2 o 3).");
             }
         } 
         while (opcion != 3);
     }
-    
+
     private static void menuCliente() 
     {
         Scanner sc = new Scanner(System.in);
-        int opcion;
-     
-        System.out.println("\n=== REGISTRO/IDENTIFICACIÓN DE CLIENTE ===");
-        cliente c = clienteFormulario.pedirDatos();
-        clienteDAO.insertarCliente(c);
-        
+        int opcion = 0;
+        cliente c = null;
+
+        while (c == null) 
+        {
+            try 
+            {
+                System.out.println("\n=== LOGIN CLIENTE ===");
+                System.out.print("Ingrese su ID (número de documento): ");
+                int id = Integer.parseInt(sc.nextLine());
+                c = clienteDAO.autenticarCliente(id);
+
+                if (c == null) 
+                {
+                    System.out.println("\n️ Cliente no registrado. Complete el formulario:");
+                    c = clienteFormulario.pedirDatos();
+                    clienteDAO.insertarCliente(c);
+                    System.out.println("Registro exitoso. Bienvenido, " + c.getNombre());
+                } 
+                else 
+                {
+                    System.out.println("Bienvenido de nuevo, " + c.getNombre());
+                }
+            } catch (NumberFormatException e) 
+            {
+                System.out.println("Error: El ID debe ser un número.");
+            }
+        }
+
         do 
         {
-            System.out.println("\n=== MENÚ CLIENTE ===");
-            System.out.println("1. Ver manicuristas disponibles");
-            System.out.println("2. Solicitar cita");
-            System.out.println("3. Ver mis citas");
-            System.out.println("4. Volver al menú principal");
-            System.out.print("Seleccione una opción: ");
-            opcion = sc.nextInt();
-            sc.nextLine(); 
-            
-            switch(opcion) 
+            try 
             {
-                case 1:
-                    break;
-                case 2:
-                    List<Disponibilidad> disponibilidades = DisponibilidadDAO.obtenerTodasDisponibilidades();
-                    cita nuevaCita = CitaFormulario.pedirDatosCita(c.getId(), disponibilidades);
-                    if (nuevaCita != null) 
-                    {
-                        CitaDAO.solicitarCita(nuevaCita);
-                    }
-                    break;
-                case 3:
-                    List<cita> citas = CitaDAO.obtenerCitasPorCliente(c.getId());
-                    System.out.println("\n=== MIS CITAS ===");
-                    for (cita cita : citas) 
-                    {
-                        System.out.printf("ID: %d, Fecha: %s, Hora: %s, Servicio: %s, Estado: %s\n", cita.getId(), cita.getFecha(), cita.getHora(), cita.getTipoServicio(), cita.getEstado());
-                    }
-                    break;
-                case 4:
-                    System.out.println("Volviendo al menú principal...");
-                    break;
-                default:
-                    System.out.println("Opción inválida");
+                System.out.println("\n=== MENÚ CLIENTE ===");
+                System.out.println("1. Ver manicuristas disponibles");
+                System.out.println("2. Solicitar cita");
+                System.out.println("3. Ver mis citas");
+                System.out.println("4. Volver al menú principal");
+                System.out.print("Seleccione una opción: ");
+                opcion = Integer.parseInt(sc.nextLine());
+
+                switch (opcion) 
+                {
+                    case 1:
+                        List<Disponibilidad> disponibilidades = DisponibilidadDAO.obtenerTodasDisponibilidades();
+                        
+                        if (disponibilidades.isEmpty()) 
+                        {
+                            System.out.println("No hay disponibilidades registradas.");
+                        } 
+                        else 
+                        {
+                            System.out.println("\n=== MANICURISTAS DISPONIBLES ===");
+                            
+                            for (Disponibilidad d : disponibilidades) 
+                            {
+                                System.out.printf("ID: %d | Fecha: %s | Hora: %s-%s | Manicurista: %s\n", d.getId(), d.getFecha(), d.getHoraInicio(), d.getHoraFin(), d.getManicuristaNombre());
+                            }
+                        }
+                        break;
+                    case 2:
+                        List<Disponibilidad> disp = DisponibilidadDAO.obtenerTodasDisponibilidades();
+                        
+                        if (disp.isEmpty()) 
+                        {
+                            System.out.println("No hay horarios disponibles.");
+                        } 
+                        else 
+                        {
+                            cita nuevaCita = CitaFormulario.pedirDatosCita(c.getId(), disp);
+                            
+                            if (nuevaCita != null) 
+                            {
+                                CitaDAO.solicitarCita(nuevaCita);
+                            }
+                        }
+                        break;
+                    case 3:
+                        List<cita> citas = CitaDAO.obtenerPorCliente(c.getId());
+                        
+                        if (citas.isEmpty()) 
+                        {
+                            System.out.println("No tienes citas agendadas.");
+                        } 
+                        else 
+                        {
+                            System.out.println("\n=== TUS CITAS ===");
+                            
+                            for (cita cita : citas) 
+                            {
+                                System.out.printf("ID: %d | Fecha: %s | Hora: %s | Servicio: %s | Estado: %s\n", cita.getId(), cita.getFecha(), cita.getHoraInicio(), cita.getHoraFin(), cita.getTipoServicio(), cita.getEstado());
+                            }
+                        }
+                        break;
+                    case 4:
+                        System.out.println("Volviendo al menú principal...");
+                        break;
+                    default:
+                        System.out.println("❌ Opción inválida.");
+                }
+            } 
+            catch (NumberFormatException e) 
+            {
+                System.out.println("❌ Error: Ingrese un número válido (1-4).");
             }
         } 
         while (opcion != 4);
     }
-    
+
     private static void menuManicurista() 
     {
         Scanner sc = new Scanner(System.in);
-        int opcion;
-       
-        System.out.println("\n=== REGISTRO/IDENTIFICACIÓN DE MANICURISTA ===");
-        manicurista m = manicuristaFormulario.pedirDatos();
-        manicuristaDAO.insertarManicurista(m);
-        
-        do 
+        int opcion = 0;
+        manicurista m = null;
+
+        while (m == null) 
         {
-            System.out.println("\n=== MENÚ MANICURISTA ===");
-            System.out.println("1. Registrar disponibilidad");
-            System.out.println("2. Ver mis disponibilidades");
-            System.out.println("3. Ver citas pendientes");
-            System.out.println("4. Aceptar/Rechazar citas");
-            System.out.println("5. Volver al menú principal");
-            System.out.print("Seleccione una opción: ");
-            opcion = sc.nextInt();
-            sc.nextLine();
-            
-            switch(opcion) 
+            try 
             {
-                case 1:
-                    Disponibilidad nuevaDisp = DisponibilidadFormulario.pedirDatosDisponibilidad(m.getId());
-                    DisponibilidadDAO.insertarDisponibilidad(nuevaDisp);
-                    break;
-                case 2:
-                    List<Disponibilidad> disponibilidades = DisponibilidadDAO.obtenerDisponibilidadPorManicurista(m.getId());
-                    System.out.println("\n=== MIS DISPONIBILIDADES ===");
-                    for (Disponibilidad d : disponibilidades) 
-                    {
-                        System.out.printf("ID: %d, Fecha: %s, Hora: %s a %s\n", d.getId(), d.getFecha(), d.getHoraInicio(), d.getHoraFin());
-                        System.out.printf("Precios: Semi sencilla: %.2f, Semi diseño: %.2f, Permanente sencilla: %.2f, Permanente diseño: %.2f\n", d.getPrecioSemiSencilla(), d.getPrecioSemiDiseño(),d.getPrecioPermanenteSencilla(), d.getPrecioPermanenteDiseño());
-                    }
-                    break;
-                case 3:
-                    List<cita> citasPendientes = CitaDAO.obtenerCitasPorManicuristaYEstado(m.getId(), "pendiente");
-                    System.out.println("\n=== CITAS PENDIENTES ===");
-                    for (cita cita : citasPendientes) 
-                    {
-                        System.out.printf("ID: %d, Fecha: %s, Hora: %s, Servicio: %s, Cliente ID: %d\n", cita.getId(), cita.getFecha(), cita.getHora(), cita.getTipoServicio(), cita.getClienteId());
-                    }
-                    break;
-                case 4:
-                    List<cita> citas = CitaDAO.obtenerCitasPorManicuristaYEstado(m.getId(), "pendiente");
-                    if (citas.isEmpty()) 
-                    {
-                        System.out.println("No hay citas pendientes");
-                        break;
-                    }
-                    
-                    System.out.println("\n=== CITAS PENDIENTES ===");
-                    for (cita cita : citas) 
-                    {
-                        System.out.printf("ID: %d, Fecha: %s, Hora: %s, Servicio: %s, Cliente ID: %d\n", cita.getId(), cita.getFecha(), cita.getHora(), cita.getTipoServicio(), cita.getClienteId());
-                    }
-                    
-                    System.out.print("\nIngrese ID de la cita a gestionar: ");
-                    int citaId = sc.nextInt();
-                    sc.nextLine();
-                    
-                    System.out.println("1. Aceptar cita");
-                    System.out.println("2. Rechazar cita");
-                    System.out.print("Seleccione una opción: ");
-                    int accion = sc.nextInt();
-                    sc.nextLine(); 
-                    
-                    if (accion == 1) 
-                    {
-                        CitaDAO.actualizarEstadoCita(citaId, "aceptada");
-                        System.out.println("Cita aceptada con éxito");
-                    } else if (accion == 2) 
-                    {
-                        CitaDAO.actualizarEstadoCita(citaId, "rechazada");
-                        System.out.println("Cita rechazada");
-                    } 
-                    else 
-                    {
-                        System.out.println("Opción inválida");
-                    }
-                    break;
-                case 5:
-                    System.out.println("Volviendo al menú principal...");
-                    break;
-                default:
-                    System.out.println("Opción inválida");
+                System.out.println("\n=== LOGIN MANICURISTA ===");
+                System.out.print("Ingrese su ID (número de documento): ");
+                int id = Integer.parseInt(sc.nextLine());
+                m = manicuristaDAO.autenticarManicurista(id);
+
+                if (m == null) 
+                {
+                    System.out.println("\n️ Manicurista no registrado. Complete el formulario:");
+                    m = manicuristaFormulario.pedirDatos();
+                    manicuristaDAO.insertarManicurista(m);
+                    System.out.println("Registro exitoso. Bienvenido, " + m.getNombre());
+                } 
+                else 
+                {
+                    System.out.println("Bienvenido de nuevo, " + m.getNombre());
+                }
+            } 
+            catch (NumberFormatException e) 
+            {
+                System.out.println("Error: El ID debe ser un número.");
             }
         }
+
+        do 
+        {
+            try 
+            {
+                System.out.println("\n=== MENÚ MANICURISTA ===");
+                System.out.println("1. Registrar disponibilidad");
+                System.out.println("2. Ver mis disponibilidades");
+                System.out.println("3. Ver citas pendientes");
+                System.out.println("4. Aceptar/Rechazar citas");
+                System.out.println("5. Volver al menú principal");
+                System.out.print("Seleccione una opción: ");
+                opcion = Integer.parseInt(sc.nextLine());
+
+                switch (opcion) 
+                {
+                    case 1:
+                        Disponibilidad nuevaDisp = DisponibilidadFormulario.pedirDatosDisponibilidad(m.getId());
+                        
+                        if (nuevaDisp != null) 
+                        {
+                            DisponibilidadDAO.insertarDisponibilidad(nuevaDisp);
+                        }
+                        break;
+                    case 2:
+                        List<Disponibilidad> disponibilidades = DisponibilidadDAO.obtenerDisponibilidadPorManicurista(m.getId());
+                        
+                        if (disponibilidades.isEmpty()) 
+                        {
+                            System.out.println("No hay disponibilidades registradas.");
+                        } 
+                        else 
+                        {
+                            System.out.println("\n=== TUS DISPONIBILIDADES ===");
+                            
+                            for (Disponibilidad d : disponibilidades) 
+                            {
+                                System.out.printf("ID: %d | Fecha: %s | Hora: %s-%s\n", d.getId(), d.getFecha(), d.getHoraInicio(), d.getHoraFin());
+                            }
+                        }
+                        break;
+                    case 3:
+                        List<cita> citasPendientes = CitaDAO.obtenerPorManicuristaYEstado(m.getId(), "pendiente");
+                        
+                        if (citasPendientes.isEmpty()) 
+                        {
+                            System.out.println("No hay citas pendientes.");
+                        } 
+                        else 
+                        {
+                            System.out.println("\n=== CITAS PENDIENTES ===");
+                            
+                            for (cita cita : citasPendientes) 
+                            {
+                                System.out.printf("ID: %d | Fecha: %s | Hora: %s | Servicio: %s\n", cita.getId(), cita.getFecha(), cita.getHoraInicio(), cita.getHoraFin(), cita.getTipoServicio());
+                            }
+                        }
+                        break;
+                    case 4:
+                        break;
+                    case 5:
+                        System.out.println("Volviendo al menú principal...");
+                        break;
+                    default:
+                        System.out.println("Opción inválida.");
+                }
+            } 
+            catch (NumberFormatException e) 
+            {
+                System.out.println("Error: Ingrese un número válido (1-5).");
+            }
+        } 
         while (opcion != 5);
     }
 }

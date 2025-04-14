@@ -2,6 +2,7 @@ package codigo;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class manicuristaDAO
@@ -24,8 +25,31 @@ public class manicuristaDAO
         }
     }
     
-    public static manicurista autenticarManicurista()
+    public static manicurista autenticarManicurista(int id)
     {
-        //login del manicurista
+        String sql = "SELECT * FROM manicurista WHERE ID_MANICURISTA = ?";
+        
+        try (Connection con = dbConnection.conectar(); PreparedStatement ps = con.prepareStatement(sql)) 
+        {
+            ps.setInt(1, id);
+            
+            try (ResultSet rs = ps.executeQuery()) 
+            {
+                if (rs.next()) 
+                {
+                    return new manicurista
+                    (
+                        rs.getInt("ID_MANICURISTA"),
+                        rs.getString("nombre"),
+                        rs.getString("telefono")
+                    );
+                }
+            }
+        } 
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

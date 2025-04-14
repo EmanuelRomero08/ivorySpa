@@ -135,6 +135,23 @@ public class DisponibilidadDAO
         }
         return null;
     }
+    public static boolean existeDisponibilidad(int disponibilidadId) 
+    {
+    String sql = "SELECT COUNT(*) FROM disponibilidades WHERE id = ?";
+    
+    try (Connection con = dbConnection.conectar(); PreparedStatement ps = con.prepareStatement(sql)) 
+    {
+        ps.setInt(1, disponibilidadId);
+        ResultSet rs = ps.executeQuery();
+        
+        return rs.next() && rs.getInt(1) > 0;
+    } 
+    catch (SQLException e) 
+    {
+        System.out.println("Error al verificar disponibilidad: " + e.getMessage());
+        return false;
+    }
+}
     
     public static boolean eliminarDisponibilidad(int id) 
     {
