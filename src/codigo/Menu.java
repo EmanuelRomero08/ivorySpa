@@ -33,12 +33,12 @@ public class Menu
                         System.out.println("Saliendo del sistema...");
                         break;
                     default:
-                        System.out.println("❌ Opción inválida. Intente de nuevo.");
+                        System.out.println("Opción inválida. Intente de nuevo.");
                 }
             } 
             catch (NumberFormatException e) 
             {
-                System.out.println("❌ Error: Ingrese un número válido (1, 2 o 3).");
+                System.out.println("Error: Ingrese un número válido (1, 2 o 3).");
             }
         } 
         while (opcion != 3);
@@ -145,12 +145,12 @@ public class Menu
                         System.out.println("Volviendo al menú principal...");
                         break;
                     default:
-                        System.out.println("❌ Opción inválida.");
+                        System.out.println("Opción inválida.");
                 }
             } 
             catch (NumberFormatException e) 
             {
-                System.out.println("❌ Error: Ingrese un número válido (1-4).");
+                System.out.println("Error: Ingrese un número válido (1-4).");
             }
         } 
         while (opcion != 4);
